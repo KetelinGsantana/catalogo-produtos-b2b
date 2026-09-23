@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="SNACK (ilustração)">
+  <rect width="240" height="240" rx="24" fill="#FCE9E3"/>
+  <path d="M70 52h100l10 18v128a10 10 0 0 1-10 10H70a10 10 0 0 1-10-10V70z" fill="#fff" stroke="#B23A1E" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="60" y="62" width="120" height="14" fill="#B23A1E" opacity=".85"/>
+  <circle cx="104" cy="120" r="18" fill="#F2B84B"/><circle cx="136" cy="132" r="18" fill="#E89A3C"/><circle cx="120" cy="108" r="14" fill="#F7CE72"/>
+  <text x="120" y="188" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#B23A1E">SNACK</text>
+</svg>
