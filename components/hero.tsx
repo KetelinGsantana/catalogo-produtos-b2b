@@ -10,7 +10,7 @@ export function Hero() {
 
         <h1 className="text-5xl font-bold text-foreground mb-4">{BRAND.name.toUpperCase()}</h1>
 
-        <p className="text-xl text-muted-foreground mb-12">Catálogo Atacado - Interativo</p>
+        <p className="text-xl text-muted-foreground mb-12">Interactive Wholesale Catalog</p>
       </div>
     </section>
   )

@@ -7,7 +7,7 @@ import { ProductCatalog } from "@/components/product-catalog"
 import { PublicCatalog } from "@/components/public-catalog"
 
 export function AppShell() {
-  const [activeTab, setActiveTab] = useState<"catalogo" | "pedido">("catalogo")
+  const [activeTab, setActiveTab] = useState<"catalog" | "order">("catalog")
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FFF8F0" }}>
@@ -16,8 +16,8 @@ export function AppShell() {
           <Image src={BRAND.logo} alt={BRAND.name} width={80} height={40} className="h-9 w-auto" />
           <nav className="flex gap-2">
             {[
-              { id: "catalogo" as const, label: "📖 Catálogo", short: "Catálogo" },
-              { id: "pedido" as const, label: "🛒 Fazer Pedido", short: "Pedido" },
+              { id: "catalog" as const, label: "📖 Catalog", short: "Catalog" },
+              { id: "order" as const, label: "🛒 Place Order", short: "Order" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -37,8 +37,8 @@ export function AppShell() {
         </div>
       </header>
       <main>
-        {activeTab === "catalogo" && <PublicCatalog />}
-        {activeTab === "pedido" && <ProductCatalog />}
+        {activeTab === "catalog" && <PublicCatalog />}
+        {activeTab === "order" && <ProductCatalog />}
       </main>
     </div>
   )

@@ -59,7 +59,7 @@ export function Filters({
             }`}
           />
           <Input
-            placeholder="Buscar produtos..."
+            placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`pl-10 ${inputClass}`}
@@ -68,11 +68,11 @@ export function Filters({
 
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
           <SelectTrigger className={`w-[200px] ${selectTriggerClass}`}>
-            <SelectValue placeholder="Categoria" />
+            <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent className={selectContentClass}>
             <SelectItem value="all" className={selectItemClass}>
-              Todas as categorias
+              All categories
             </SelectItem>
             {categories.map((category) => (
               <SelectItem key={category} value={category} className={selectItemClass}>
@@ -83,25 +83,25 @@ export function Filters({
         </Select>
 
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className={`w-[150px] ${selectTriggerClass}`}>
+          <SelectTrigger className={`w-[160px] ${selectTriggerClass}`}>
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent className={selectContentClass}>
             <SelectItem value="all" className={selectItemClass}>
-              Todos
+              All statuses
             </SelectItem>
-            <SelectItem value="DISPONÍVEL" className={selectItemClass}>
-              Disponível
+            <SelectItem value="AVAILABLE" className={selectItemClass}>
+              Available
             </SelectItem>
-            <SelectItem value="ESGOTADO" className={selectItemClass}>
-              Esgotado
+            <SelectItem value="OUT OF STOCK" className={selectItemClass}>
+              Out of stock
             </SelectItem>
           </SelectContent>
         </Select>
 
         <Button variant="outline" onClick={clearFilters} className={buttonClass}>
           <X className="w-4 h-4 mr-2" />
-          Limpar
+          Clear
         </Button>
       </div>
     </div>

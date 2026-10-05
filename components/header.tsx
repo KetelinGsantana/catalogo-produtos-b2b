@@ -18,7 +18,7 @@ export function Header() {
               🏠 Home
             </Button>
             <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-              🥣 Granolas
+              🥣 Granola
             </Button>
             <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
               🍿 Snacks
@@ -27,10 +27,10 @@ export function Header() {
               🎁 Mini Packs
             </Button>
             <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-              📊 Comparativo
+              📊 Compare
             </Button>
             <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-              📞 Contato
+              📞 Contact
             </Button>
           </div>
         </nav>

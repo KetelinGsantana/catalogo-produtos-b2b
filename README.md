@@ -1,42 +1,50 @@
-# Catálogo de Produtos com Controle de Validade
+# B2B Wholesale Ordering Catalog
 
-Aplicação web para gestão de catálogo de produtos com foco em rastreamento de datas de validade. Desenvolvida para times de operações e logística que precisam monitorar estoque por prazo de vencimento.
+An online catalog where wholesale customers browse products and build their orders. It replaces the huge Excel spreadsheet that usually goes back and forth between supplier and retailer: instead of scrolling row by row, the customer filters, searches, sees everything needed to buy, and exports a ready-made order.
 
-> **Dados fictícios.** A marca "Aurora Naturais", os produtos, preços, EANs, validades,
-> tabelas nutricionais e ilustrações são inventados para demonstração e não representam
-> nenhuma empresa real. O nome da marca fica em `lib/brand.ts`.
+For each product, the wholesale customer sees:
 
-## Funcionalidades
+- **Wholesale price** and **suggested retail price**, with the **markup** already calculated
+- **Expiration date** of the current batch and **months left** until it expires
+- **EAN** (barcode) and **NCM** (Mercosur tax code), for registering the product in the store's system
+- **Availability** (available / out of stock) and labels such as sale and new
 
-- Listagem de produtos com status de disponibilidade
-- Filtros por categoria e status (disponível / esgotado)
-- Busca por nome do produto
-- Ordenação por qualquer coluna (nome, categoria, validade, preço)
-- Indicação visual de produtos próximos ao vencimento
-- Layout responsivo com cards para mobile e tabela para desktop
-- Catálogo público separado para visualização sem autenticação
+> **About the sample data:** the "Aurora Naturals" brand, products, prices, EANs, expiration
+> dates, nutrition facts and illustrations in this repository are fictional and used only to
+> demonstrate the catalog. To use real products, edit `data/products.ts`, `data/nutrition.ts`
+> and the brand name in `lib/brand.ts`.
 
-## Tecnologias
+## Features
+
+- Order building: the customer enters a quantity for each item and sees the running total
+- Order export to CSV or PDF to send to the supplier
+- Product search by name and filters by category and availability
+- Column sorting (product, category, size, prices, markup, expiration, EAN, NCM, status)
+- Detail columns (expiration, EAN, NCM) that can be shown or hidden
+- Responsive layout: a table on desktop and cards on mobile
+- Visual catalog with a nutrition table for each product (`PublicCatalog` component)
+
+## Tech Stack
 
 - [Next.js 16](https://nextjs.org/) (App Router)
 - [TypeScript](https://www.typescriptlang.org/)
 - [shadcn/ui](https://ui.shadcn.com/) (Radix UI + Tailwind CSS)
 
-## Como rodar localmente
+## Running Locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Acesse [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
 
-## Estrutura
+## Project Structure
 
 ```
-app/           # Rotas (Next.js App Router)
-components/    # Componentes React (catálogo, filtros, cards)
-data/          # Dados dos produtos e informações nutricionais
-lib/           # Utilitários e marca fictícia (brand.ts)
-public/        # Ilustrações (SVG) e logo fictício
+app/           # Routes (Next.js App Router)
+components/    # React components (order table, filters, cards, visual catalog)
+data/          # Products (prices, expiration, EAN, NCM) and nutrition facts
+lib/           # Utilities, formatting and brand name/logo (brand.ts)
+public/        # Illustrations (SVG) and logo
 ```

@@ -12,78 +12,81 @@ import { SortableHeader } from "@/components/sortable-header"
 import { MobileProductCard } from "@/components/mobile-product-card"
 import { ChevronRight, ChevronDown, Download, FileText } from "lucide-react"
 import Image from "next/image"
-import { BRAND, getCategoryEmoji } from "@/lib/brand"
+import { BRAND, getCategoryEmoji, getTagStyle } from "@/lib/brand"
+import { formatCurrency, formatDate } from "@/lib/format"
+
+type SortKey = keyof Pick<
+  Product,
+  | "name"
+  | "category"
+  | "size"
+  | "wholesalePrice"
+  | "retailPrice"
+  | "markup"
+  | "expirationDate"
+  | "monthsToExpiry"
+  | "ean"
+  | "ncm"
+  | "status"
+>
 
 export function ProductCatalog() {
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null)
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: "asc" | "desc" } | null>(null)
   const [showOptionalColumns, setShowOptionalColumns] = useState(false)
   const [quantities, setQuantities] = useState<Record<string, number>>({})
 
   const categories = useMemo(() => {
-    return Array.from(new Set(products.map((p) => p.categoria)))
+    return Array.from(new Set(products.map((p) => p.category)))
   }, [])
 
   const filteredAndSortedProducts = useMemo(() => {
+    const term = searchTerm.toLowerCase()
     const filtered = products.filter((product) => {
       const matchesSearch =
-        product.produto.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.categoria.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesCategory = categoryFilter === "all" || product.categoria === categoryFilter
+        product.name.toLowerCase().includes(term) || product.category.toLowerCase().includes(term)
+      const matchesCategory = categoryFilter === "all" || product.category === categoryFilter
       const matchesStatus = statusFilter === "all" || product.status === statusFilter
 
       return matchesSearch && matchesCategory && matchesStatus
     })
 
     if (sortConfig) {
+      const { key, direction } = sortConfig
       filtered.sort((a, b) => {
-        const aValue = a[sortConfig.key as keyof Product]
-        const bValue = b[sortConfig.key as keyof Product]
-
-        if (sortConfig.key.includes("preco") || sortConfig.key === "mkp") {
-          const aNum = Number.parseFloat(
-            aValue
-              .replace(/[R$\s]/g, "")
-              .replace(",", ".")
-              .replace("-", "0"),
-          )
-          const bNum = Number.parseFloat(
-            bValue
-              .replace(/[R$\s]/g, "")
-              .replace(",", ".")
-              .replace("-", "0"),
-          )
-          return sortConfig.direction === "asc" ? aNum - bNum : bNum - aNum
-        }
-
-        if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1
-        if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1
-        return 0
+        const aValue = a[key]
+        const bValue = b[key]
+        const order =
+          typeof aValue === "number" && typeof bValue === "number"
+            ? aValue - bValue
+            : String(aValue).localeCompare(String(bValue), "en", { numeric: true })
+        return direction === "asc" ? order : -order
       })
     }
 
     return filtered
   }, [searchTerm, categoryFilter, statusFilter, sortConfig])
 
-  const orderSummary = useMemo(() => {
-    let totalQuantity = 0
-    let totalValue = 0
-
-    Object.entries(quantities).forEach(([productName, quantity]) => {
-      if (quantity > 0) {
-        const product = products.find((p) => p.produto === productName)
-        if (product) {
-          totalQuantity += quantity
-          const price = Number.parseFloat(product.precoAtacado.replace(/[R$\s]/g, "").replace(",", "."))
-          totalValue += quantity * price
-        }
-      }
-    })
-
-    return { totalQuantity, totalValue }
+  const orderItems = useMemo(() => {
+    return products
+      .filter((product) => (quantities[product.name] || 0) > 0)
+      .map((product) => {
+        const quantity = quantities[product.name]
+        return { product, quantity, total: quantity * product.wholesalePrice }
+      })
   }, [quantities])
+
+  const orderSummary = useMemo(() => {
+    return orderItems.reduce(
+      (summary, item) => ({
+        totalQuantity: summary.totalQuantity + item.quantity,
+        totalValue: summary.totalValue + item.total,
+      }),
+      { totalQuantity: 0, totalValue: 0 },
+    )
+  }, [orderItems])
 
   const handleQuantityChange = (productName: string, quantity: number) => {
     setQuantities((prev) => ({
@@ -93,60 +96,39 @@ export function ProductCatalog() {
   }
 
   const exportToCSV = () => {
-    const orderItems = Object.entries(quantities)
-      .filter(([_, quantity]) => quantity > 0)
-      .map(([productName, quantity]) => {
-        const product = products.find((p) => p.produto === productName)
-        if (!product) return null
-        const price = Number.parseFloat(product.precoAtacado.replace(/[R$\s]/g, "").replace(",", "."))
-        return {
-          produto: product.produto,
-          quantidade: quantity,
-          precoAtacado: product.precoAtacado,
-          total: (quantity * price).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
-        }
-      })
-      .filter(Boolean)
-
     if (orderItems.length === 0) {
-      alert("Adicione produtos ao pedido antes de exportar")
+      alert("Add products to the order before exporting")
       return
     }
 
     const csvContent = [
-      "Produto,Quantidade,Preço Atacado,Total",
-      ...orderItems.map((item) => `"${item.produto}",${item.quantidade},"${item.precoAtacado}","${item.total}"`),
-      `,,Total Geral:,"${orderSummary.totalValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}"`,
+      "Product,Quantity,Wholesale Price,Total",
+      ...orderItems.map(
+        (item) =>
+          `"${item.product.name}",${item.quantity},"${formatCurrency(item.product.wholesalePrice)}","${formatCurrency(item.total)}"`,
+      ),
+      `,,Grand Total:,"${formatCurrency(orderSummary.totalValue)}"`,
     ].join("\n")
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
     const link = document.createElement("a")
     link.href = URL.createObjectURL(blob)
-    link.download = `pedido_aurora_${new Date().toISOString().split("T")[0]}.csv`
+    link.download = `aurora_order_${new Date().toISOString().split("T")[0]}.csv`
     link.click()
   }
 
   const exportToPDF = () => {
-    const orderItems = Object.entries(quantities)
-      .filter(([_, quantity]) => quantity > 0)
-      .map(([productName, quantity]) => {
-        const product = products.find((p) => p.produto === productName)
-        if (!product) return null
-        const price = Number.parseFloat(product.precoAtacado.replace(/[R$\s]/g, "").replace(",", "."))
-        return { product, quantity, price, total: quantity * price }
-      })
-      .filter(Boolean)
-
     if (orderItems.length === 0) {
-      alert("Adicione produtos ao pedido antes de exportar")
+      alert("Add products to the order before exporting")
       return
     }
 
     const printWindow = window.open("", "_blank")
+    if (!printWindow) return
     const content = `
       <html>
         <head>
-          <title>Pedido ${BRAND.name}</title>
+          <title>${BRAND.name} Order</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -156,34 +138,34 @@ export function ProductCatalog() {
           </style>
         </head>
         <body>
-          <h1>Pedido ${BRAND.name}</h1>
-          <p>Data: ${new Date().toLocaleDateString("pt-BR")}</p>
+          <h1>${BRAND.name} Order</h1>
+          <p>Date: ${new Date().toLocaleDateString("en-US")}</p>
           <table>
             <thead>
               <tr>
-                <th>Produto</th>
-                <th>Quantidade</th>
-                <th>Preço Atacado</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Wholesale Price</th>
                 <th>Total</th>
               </tr>
             </thead>
             <tbody>
               ${orderItems
-        .map(
-          (item) => `
+                .map(
+                  (item) => `
                 <tr>
-                  <td>${item.product.produto}</td>
+                  <td>${item.product.name}</td>
                   <td>${item.quantity}</td>
-                  <td>${item.product.precoAtacado}</td>
-                  <td>${item.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                  <td>${formatCurrency(item.product.wholesalePrice)}</td>
+                  <td>${formatCurrency(item.total)}</td>
                 </tr>
               `,
-        )
-        .join("")}
+                )
+                .join("")}
               <tr class="total">
-                <td colspan="2">Total Geral</td>
-                <td>${orderSummary.totalQuantity} itens</td>
-                <td>${orderSummary.totalValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                <td colspan="2">Grand Total</td>
+                <td>${orderSummary.totalQuantity} items</td>
+                <td>${formatCurrency(orderSummary.totalValue)}</td>
               </tr>
             </tbody>
           </table>
@@ -196,11 +178,12 @@ export function ProductCatalog() {
   }
 
   const handleSort = (key: string) => {
+    const sortKey = key as SortKey
     setSortConfig((current) => {
-      if (current?.key === key) {
-        return { key, direction: current.direction === "asc" ? "desc" : "asc" }
+      if (current?.key === sortKey) {
+        return { key: sortKey, direction: current.direction === "asc" ? "desc" : "asc" }
       }
-      return { key, direction: "asc" }
+      return { key: sortKey, direction: "asc" }
     })
   }
 
@@ -214,9 +197,9 @@ export function ProductCatalog() {
         <div className="text-center mb-8 md:mb-12">
           <div className="flex items-center justify-center gap-4 mb-4">
             <Image src={BRAND.logo} alt={`${BRAND.name} Logo`} width={80} height={40} className="h-10 w-auto" />
-            <h1 className={`text-2xl md:text-4xl font-bold ${textClass}`}>Tabela Comercial - Lojistas</h1>
+            <h1 className={`text-2xl md:text-4xl font-bold ${textClass}`}>Wholesale Price List</h1>
           </div>
-          <p className={`${subtitleClass} text-base md:text-lg`}>Monte seu pedido e exporte para finalizar a compra</p>
+          <p className={`${subtitleClass} text-base md:text-lg`}>Build your order and export it to complete your purchase</p>
         </div>
 
         {orderSummary.totalQuantity > 0 && (
@@ -224,10 +207,9 @@ export function ProductCatalog() {
             <CardContent className="p-4">
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-center md:text-left">
-                  <h3 className={`text-lg font-bold ${textClass}`}>Resumo do Pedido</h3>
+                  <h3 className={`text-lg font-bold ${textClass}`}>Order Summary</h3>
                   <p className={subtitleClass}>
-                    {orderSummary.totalQuantity} itens • Total:{" "}
-                    {orderSummary.totalValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    {orderSummary.totalQuantity} items • Total: {formatCurrency(orderSummary.totalValue)}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -262,7 +244,7 @@ export function ProductCatalog() {
             className="border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center gap-2"
           >
             {showOptionalColumns ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            {showOptionalColumns ? "Ocultar" : "Mostrar"} Detalhes (Validade, EAN, NCM)
+            {showOptionalColumns ? "Hide" : "Show"} Details (Expiration, EAN, NCM)
           </Button>
         </div>
 
@@ -279,13 +261,13 @@ export function ProductCatalog() {
 
         <div className="block md:hidden">
           <div className="space-y-4">
-            {filteredAndSortedProducts.map((product, index) => (
+            {filteredAndSortedProducts.map((product) => (
               <MobileProductCard
-                key={index}
+                key={product.ean}
                 product={product}
                 theme="white"
-                quantity={quantities[product.produto] || 0}
-                onQuantityChange={(quantity) => handleQuantityChange(product.produto, quantity)}
+                quantity={quantities[product.name] || 0}
+                onQuantityChange={(quantity) => handleQuantityChange(product.name, quantity)}
               />
             ))}
           </div>
@@ -299,61 +281,61 @@ export function ProductCatalog() {
                   <TableHeader>
                     <TableRow className="border-slate-200 hover:bg-slate-50">
                       <TableHead className="py-4">
-                        <SortableHeader sortKey="produto" currentSort={sortConfig} onSort={handleSort} theme="white">
-                          Produto
+                        <SortableHeader sortKey="name" currentSort={sortConfig} onSort={handleSort} theme="white">
+                          Product
                         </SortableHeader>
                       </TableHead>
                       <TableHead>
-                        <SortableHeader sortKey="categoria" currentSort={sortConfig} onSort={handleSort} theme="white">
-                          Categoria
+                        <SortableHeader sortKey="category" currentSort={sortConfig} onSort={handleSort} theme="white">
+                          Category
                         </SortableHeader>
                       </TableHead>
                       <TableHead>
-                        <SortableHeader sortKey="peso" currentSort={sortConfig} onSort={handleSort} theme="white">
-                          Peso
+                        <SortableHeader sortKey="size" currentSort={sortConfig} onSort={handleSort} theme="white">
+                          Size
                         </SortableHeader>
                       </TableHead>
                       <TableHead>
                         <SortableHeader
-                          sortKey="precoAtacado"
+                          sortKey="wholesalePrice"
                           currentSort={sortConfig}
                           onSort={handleSort}
                           theme="white"
                         >
-                          Preço Atacado
+                          Wholesale Price
                         </SortableHeader>
                       </TableHead>
-                      <TableHead className={textClass}>Quantidade</TableHead>
+                      <TableHead className={textClass}>Quantity</TableHead>
                       <TableHead>
-                        <SortableHeader
-                          sortKey="precoRevenda"
-                          currentSort={sortConfig}
-                          onSort={handleSort}
-                          theme="white"
-                        >
-                          Preço Revenda
+                        <SortableHeader sortKey="retailPrice" currentSort={sortConfig} onSort={handleSort} theme="white">
+                          Retail Price
                         </SortableHeader>
                       </TableHead>
                       <TableHead>
-                        <SortableHeader sortKey="mkp" currentSort={sortConfig} onSort={handleSort} theme="white">
-                          MKP
+                        <SortableHeader sortKey="markup" currentSort={sortConfig} onSort={handleSort} theme="white">
+                          Markup
                         </SortableHeader>
                       </TableHead>
                       {showOptionalColumns && (
                         <>
                           <TableHead>
                             <SortableHeader
-                              sortKey="validade"
+                              sortKey="expirationDate"
                               currentSort={sortConfig}
                               onSort={handleSort}
                               theme="white"
                             >
-                              Validade
+                              Expiration
                             </SortableHeader>
                           </TableHead>
                           <TableHead>
-                            <SortableHeader sortKey="valMes" currentSort={sortConfig} onSort={handleSort} theme="white">
-                              Val. em Mês
+                            <SortableHeader
+                              sortKey="monthsToExpiry"
+                              currentSort={sortConfig}
+                              onSort={handleSort}
+                              theme="white"
+                            >
+                              Months Left
                             </SortableHeader>
                           </TableHead>
                           <TableHead>
@@ -377,64 +359,60 @@ export function ProductCatalog() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredAndSortedProducts.map((product, index) => {
-                      const quantity = quantities[product.produto] || 0
-                      const price = Number.parseFloat(product.precoAtacado.replace(/[R$\s]/g, "").replace(",", "."))
-                      const total = quantity * price
+                    {filteredAndSortedProducts.map((product) => {
+                      const quantity = quantities[product.name] || 0
+                      const total = quantity * product.wholesalePrice
 
                       return (
                         <TableRow
-                          key={index}
+                          key={product.ean}
                           className="border-slate-200 hover:bg-slate-50 transition-all duration-200 hover:shadow-lg"
                         >
                           <TableCell className={`font-medium ${textClass} py-4`}>
                             <div className="flex items-center gap-3">
-                              <div className="relative">
-                                {product.image ? (
-                                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-white flex-shrink-0">
-                                    <Image
-                                      src={product.image || "/placeholder.svg"}
-                                      alt={product.produto}
-                                      width={48}
-                                      height={48}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-red-500 rounded flex items-center justify-center text-white text-xs font-bold">
-                                    {getCategoryEmoji(product.categoria)}
-                                  </div>
-                                )}
-                                {product.tag && (
-                                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold px-1 rounded">
-                                    {product.tag}
-                                  </div>
-                                )}
-                              </div>
+                              {product.image ? (
+                                <div className="w-12 h-12 rounded-lg overflow-hidden bg-white flex-shrink-0">
+                                  <Image
+                                    src={product.image}
+                                    alt={product.name}
+                                    width={48}
+                                    height={48}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-red-500 rounded flex items-center justify-center text-white text-xs font-bold">
+                                  {getCategoryEmoji(product.category)}
+                                </div>
+                              )}
                               <div className="flex flex-col">
-                                <span>{product.produto}</span>
+                                <span>{product.name}</span>
                                 {product.tag && (
-                                  <Badge className="w-fit mt-1 bg-red-500 text-white text-[10px] px-2 py-0">
+                                  <Badge
+                                    className={`w-fit mt-1 text-[10px] font-semibold tracking-wide px-2 py-0.5 ${getTagStyle(product.tag)}`}
+                                  >
                                     {product.tag}
                                   </Badge>
                                 )}
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="text-slate-700">{product.categoria}</TableCell>
-                          <TableCell className="text-slate-700">{product.peso}</TableCell>
+                          <TableCell className="text-slate-700">{product.category}</TableCell>
+                          <TableCell className="text-slate-700">{product.size}</TableCell>
                           <TableCell className="font-semibold">
-                            {product.precoAtacadoOriginal ? (
+                            {product.originalWholesalePrice ? (
                               <div className="flex flex-col">
-                                <span className="text-slate-400 line-through text-sm">{product.precoAtacadoOriginal}</span>
-                                <span className="text-green-600">{product.precoAtacado}</span>
+                                <span className="text-slate-400 line-through text-sm">
+                                  {formatCurrency(product.originalWholesalePrice)}
+                                </span>
+                                <span className="text-green-600">{formatCurrency(product.wholesalePrice)}</span>
                               </div>
                             ) : (
-                              <span className="text-green-600">{product.precoAtacado}</span>
+                              <span className="text-green-600">{formatCurrency(product.wholesalePrice)}</span>
                             )}
                           </TableCell>
                           <TableCell>
-                            {product.status === "ESGOTADO" ? (
+                            {product.status === "OUT OF STOCK" ? (
                               <span className="text-slate-400 text-sm">-</span>
                             ) : (
                               <Input
@@ -442,28 +420,31 @@ export function ProductCatalog() {
                                 min="0"
                                 value={quantity}
                                 onChange={(e) =>
-                                  handleQuantityChange(product.produto, Number.parseInt(e.target.value) || 0)
+                                  handleQuantityChange(product.name, Number.parseInt(e.target.value) || 0)
                                 }
                                 className="w-20 text-center border-orange-400 focus:border-orange-500 focus:ring-orange-500"
                                 placeholder="0"
+                                aria-label={`Quantity of ${product.name}`}
                               />
                             )}
                           </TableCell>
-                          <TableCell className="text-blue-600 font-semibold">{product.precoRevenda}</TableCell>
-                          <TableCell className="text-yellow-600 font-semibold">{product.mkp}</TableCell>
+                          <TableCell className="text-blue-600 font-semibold">
+                            {formatCurrency(product.retailPrice)}
+                          </TableCell>
+                          <TableCell className="text-yellow-600 font-semibold">{product.markup.toFixed(2)}x</TableCell>
                           {showOptionalColumns && (
                             <>
-                              <TableCell className="text-slate-700">{product.validade}</TableCell>
-                              <TableCell className="text-slate-700">{product.valMes}</TableCell>
+                              <TableCell className="text-slate-700">{formatDate(product.expirationDate)}</TableCell>
+                              <TableCell className="text-slate-700">{product.monthsToExpiry} mo</TableCell>
                               <TableCell className="font-mono text-xs text-slate-600">{product.ean}</TableCell>
                               <TableCell className="font-mono text-xs text-slate-600">{product.ncm}</TableCell>
                             </>
                           )}
                           <TableCell>
                             <Badge
-                              variant={product.status === "DISPONÍVEL" ? "default" : "destructive"}
+                              variant={product.status === "AVAILABLE" ? "default" : "destructive"}
                               className={
-                                product.status === "DISPONÍVEL"
+                                product.status === "AVAILABLE"
                                   ? "bg-green-500/20 text-green-600 border-green-500/30 hover:bg-green-500/30"
                                   : "bg-red-500/20 text-red-600 border-red-500/30 hover:bg-red-500/30"
                               }
@@ -472,7 +453,7 @@ export function ProductCatalog() {
                             </Badge>
                           </TableCell>
                           <TableCell className={`font-semibold ${quantity > 0 ? "text-green-600" : "text-slate-400"}`}>
-                            {quantity > 0 ? total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "-"}
+                            {quantity > 0 ? formatCurrency(total) : "-"}
                           </TableCell>
                         </TableRow>
                       )
@@ -486,7 +467,7 @@ export function ProductCatalog() {
 
         <div className="mt-4 text-center">
           <p className="text-slate-600">
-            Mostrando {filteredAndSortedProducts.length} de {products.length} produtos
+            Showing {filteredAndSortedProducts.length} of {products.length} products
           </p>
         </div>
 
@@ -496,7 +477,7 @@ export function ProductCatalog() {
               <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                 <span className="text-xl md:text-2xl">💰</span>
               </div>
-              <h3 className={`text-lg md:text-xl font-bold ${textClass} mb-2`}>Maior MKP</h3>
+              <h3 className={`text-lg md:text-xl font-bold ${textClass} mb-2`}>Healthy Markup</h3>
             </CardContent>
           </Card>
 
@@ -505,7 +486,7 @@ export function ProductCatalog() {
               <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-red-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                 <span className="text-xl md:text-2xl">🚀</span>
               </div>
-              <h3 className={`text-lg md:text-xl font-bold ${textClass} mb-2`}>Giro Rápido</h3>
+              <h3 className={`text-lg md:text-xl font-bold ${textClass} mb-2`}>Fast Turnover</h3>
             </CardContent>
           </Card>
 
@@ -514,7 +495,7 @@ export function ProductCatalog() {
               <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                 <span className="text-xl md:text-2xl">💪</span>
               </div>
-              <h3 className={`text-lg md:text-xl font-bold ${textClass} mb-2`}>Alto Ticket</h3>
+              <h3 className={`text-lg md:text-xl font-bold ${textClass} mb-2`}>High Average Ticket</h3>
             </CardContent>
           </Card>
         </div>

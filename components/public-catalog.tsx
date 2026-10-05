@@ -1,56 +1,56 @@
 "use client"
 
 // ============================================================
-//  CATÁLOGO DE PRODUTOS — MARCA FICTÍCIA (lib/brand.ts)
+//  PRODUCT CATALOG — SAMPLE BRAND (lib/brand.ts)
 //
-//  Componente voltado ao público (lojistas / consumidores).
-//  Exibe os produtos com cards visuais e tabelas nutricionais.
+//  Public-facing component (retailers / shoppers).
+//  Shows products as visual cards with nutrition tables.
 //
-//  Como editar:
-//  - Dados nutricionais → data/nutrition.ts
-//  - Dados comerciais (preços, status) → data/products.ts
-//  - Cores e fontes → seção "TEMA" abaixo
-//  - Para adicionar um produto: insira em nutritionData e
-//    (se tiver preço) em products.ts
+//  How to edit:
+//  - Nutrition data → data/nutrition.ts
+//  - Commercial data (prices, status) → data/products.ts
+//  - Colors and fonts → "THEME" section below
+//  - To add a product: add it to nutritionData and
+//    (if it has a price) to products.ts
 // ============================================================
 
 import { useState } from "react"
 import Image from "next/image"
-import { nutritionData, nutriCategories, type NutritionInfo } from "@/data/nutrition"
+import { nutritionData, nutritionCategories, type NutritionInfo } from "@/data/nutrition"
 import { BRAND, getCategoryEmoji } from "@/lib/brand"
 
 // ─────────────────────────────────────────────────────────
-//  TEMA — edite aqui para mudar as cores globais
+//  THEME — edit here to change the global colors
 // ─────────────────────────────────────────────────────────
 const THEME = {
-  // Fundo da página
+  // Page background
   pageBg: "bg-[#FFF8F0]",
-  // Cor primária (marrom escuro da marca)
+  // Primary color (brand dark brown)
   primary: "#3D1C06",
-  // Cor de destaque (laranja da marca)
+  // Accent color (brand orange)
   accent: "#E85D04",
-  // Fundo de card
+  // Card background
   cardBg: "bg-white",
-  // Borda do card
+  // Card border
   cardBorder: "border-[#E8D5C0]",
-  // Texto principal
+  // Main text
   textPrimary: "text-[#3D1C06]",
-  // Texto secundário
+  // Secondary text
   textSecondary: "text-[#7A5C44]",
-  // Badge de categoria
+  // Category badge
   badgeBg: "bg-[#F4E4D4]",
   badgeText: "text-[#7A5C44]",
-  // Tabela nutricional — linha alternada
+  // Nutrition table — alternate row
   tableAlt: "bg-[#FFF8F0]",
-  // Botão de ver tabela
+  // Show-table button
   btnBg: "bg-[#3D1C06]",
   btnText: "text-white",
   btnHover: "hover:bg-[#5A2D0C]",
 }
 
 // ─────────────────────────────────────────────────────────
-//  MAPA DE CORES POR CATEGORIA
-//  Edite para mudar a identidade visual de cada categoria
+//  CATEGORY COLOR MAP
+//  Edit to change the visual identity of each category
 // ─────────────────────────────────────────────────────────
 const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
   "Granola": {
@@ -58,30 +58,30 @@ const categoryColors: Record<string, { bg: string; text: string; border: string 
     text: "text-amber-800",
     border: "border-amber-200",
   },
-  "Pasta de Oleaginosas": {
+  "Nut Butters": {
     bg: "bg-orange-50",
     text: "text-orange-800",
     border: "border-orange-200",
   },
-  "Snack Assado": {
+  "Baked Snacks": {
     bg: "bg-red-50",
     text: "text-red-800",
     border: "border-red-200",
   },
-  "Chá e Infusão": {
+  "Teas & Infusions": {
     bg: "bg-emerald-50",
     text: "text-emerald-800",
     border: "border-emerald-200",
   },
-  "Barra de Cereal": {
+  "Cereal Bars": {
     bg: "bg-purple-50",
     text: "text-purple-800",
     border: "border-purple-200",
   },
 }
 
-function getCategoryStyle(categoria: string) {
-  return categoryColors[categoria] ?? {
+function getCategoryStyle(category: string) {
+  return categoryColors[category] ?? {
     bg: "bg-slate-50",
     text: "text-slate-700",
     border: "border-slate-200",
@@ -89,11 +89,11 @@ function getCategoryStyle(categoria: string) {
 }
 
 // ─────────────────────────────────────────────────────────
-//  SUB-COMPONENTE: Card de Produto
+//  SUB-COMPONENT: Product Card
 // ─────────────────────────────────────────────────────────
 function ProductCard({ product }: { product: NutritionInfo }) {
   const [showTable, setShowTable] = useState(false)
-  const catStyle = getCategoryStyle(product.categoria)
+  const catStyle = getCategoryStyle(product.category)
 
   return (
     <article
@@ -106,13 +106,13 @@ function ProductCard({ product }: { product: NutritionInfo }) {
         hover:shadow-lg
       `}
     >
-      {/* ── Imagem do produto ── */}
+      {/* ── Product image ── */}
       <div className="relative bg-[#FFF8F0] flex items-center justify-center"
            style={{ minHeight: "200px" }}>
         {product.image ? (
           <Image
             src={product.image}
-            alt={product.displayName}
+            alt={product.name}
             width={220}
             height={220}
             className="object-contain p-4 w-full"
@@ -120,11 +120,11 @@ function ProductCard({ product }: { product: NutritionInfo }) {
           />
         ) : (
           <div className="flex items-center justify-center w-full h-48">
-            <span className="text-6xl">{getCategoryEmoji(product.categoria)}</span>
+            <span className="text-6xl">{getCategoryEmoji(product.category)}</span>
           </div>
         )}
 
-        {/* Badge de categoria no topo esquerdo */}
+        {/* Category badge in the top-left corner */}
         <span
           className={`
             absolute top-3 left-3
@@ -132,30 +132,30 @@ function ProductCard({ product }: { product: NutritionInfo }) {
             ${catStyle.bg} ${catStyle.text} border ${catStyle.border}
           `}
         >
-          {product.categoria}
+          {product.category}
         </span>
       </div>
 
-      {/* ── Conteúdo principal ── */}
+      {/* ── Main content ── */}
       <div className="p-5 flex flex-col flex-1 gap-4">
 
-        {/* Nome do produto */}
+        {/* Product name */}
         <h3
           className={`text-lg font-bold leading-snug ${THEME.textPrimary}`}
           style={{ fontSize: "1.1rem", lineHeight: "1.4" }}
         >
-          {product.displayName}
+          {product.name}
         </h3>
 
-        {/* Porção */}
+        {/* Serving */}
         <p className={`text-sm ${THEME.textSecondary}`}>
-          📦 Porção: <strong>{product.porcao}</strong>
-          {product.porcoesPorEmbalagem && (
-            <> · {product.porcoesPorEmbalagem}</>
+          📦 Serving: <strong>{product.servingSize}</strong>
+          {product.servingsPerPackage && (
+            <> · {product.servingsPerPackage}</>
           )}
         </p>
 
-        {/* ── Destaques nutricionais (3 números grandes) ── */}
+        {/* ── Nutrition highlights (3 big figures) ── */}
         <div className="grid grid-cols-3 gap-2">
           {product.highlights.map((h, i) => (
             <div
@@ -167,16 +167,16 @@ function ProductCard({ product }: { product: NutritionInfo }) {
                 className="font-extrabold"
                 style={{ color: THEME.accent, fontSize: "1.2rem", lineHeight: 1 }}
               >
-                {h.valor}
+                {h.value}
               </span>
               <span className={`text-xs ${THEME.textSecondary}`}>{h.label}</span>
             </div>
           ))}
         </div>
 
-        {/* ── Diferenciais / Alertas ── */}
+        {/* ── Features ── */}
         <div className="flex flex-wrap gap-2">
-          {product.diferenciais.map((d, i) => (
+          {product.features.map((d, i) => (
             <span
               key={i}
               className="text-xs px-2 py-1 rounded-full bg-[#F4E4D4] text-[#7A5C44] font-medium"
@@ -186,22 +186,22 @@ function ProductCard({ product }: { product: NutritionInfo }) {
           ))}
         </div>
 
-        {/* ── Modo de uso ── */}
-        {product.modoDeUso && (
+        {/* ── Directions ── */}
+        {product.directions && (
           <p className={`text-sm ${THEME.textSecondary} italic border-l-4 pl-3`}
              style={{ borderColor: THEME.accent }}>
-            {product.modoDeUso}
+            {product.directions}
           </p>
         )}
 
         {/* ── Shelf Life ── */}
         {product.shelfLife && product.shelfLife !== "—" && (
           <p className={`text-sm ${THEME.textSecondary}`}>
-            ⏳ Validade: <strong>{product.shelfLife}</strong>
+            ⏳ Shelf life: <strong>{product.shelfLife}</strong>
           </p>
         )}
 
-        {/* ── Botão abrir/fechar tabela nutricional ── */}
+        {/* ── Show/hide nutrition table button ── */}
         <button
           onClick={() => setShowTable((v) => !v)}
           className={`
@@ -215,13 +215,13 @@ function ProductCard({ product }: { product: NutritionInfo }) {
           aria-expanded={showTable}
           style={{ fontSize: "1rem" }}
         >
-          {showTable ? "▲ Ocultar" : "📊 Ver"} Tabela Nutricional
+          {showTable ? "▲ Hide" : "📊 View"} Nutrition Facts
         </button>
 
-        {/* ── Tabela Nutricional (expansível) ── */}
+        {/* ── Nutrition table (expandable) ── */}
         {showTable && (
           <div className="mt-2 rounded-xl overflow-hidden border border-[#E8D5C0]">
-            <table className="w-full text-sm" role="table" aria-label="Tabela Nutricional">
+            <table className="w-full text-sm" role="table" aria-label="Nutrition Facts">
               <thead>
                 <tr style={{ backgroundColor: THEME.primary }}>
                   <th
@@ -229,21 +229,21 @@ function ProductCard({ product }: { product: NutritionInfo }) {
                     style={{ fontSize: "0.9rem" }}
                     scope="col"
                   >
-                    Nutriente
+                    Nutrient
                   </th>
                   <th
                     className="text-white text-right py-3 px-4 font-semibold"
                     style={{ fontSize: "0.9rem" }}
                     scope="col"
                   >
-                    Quantidade
+                    Amount
                   </th>
                   <th
                     className="text-white text-right py-3 px-4 font-semibold"
                     style={{ fontSize: "0.9rem" }}
                     scope="col"
                   >
-                    %VD*
+                    %DV*
                   </th>
                 </tr>
               </thead>
@@ -257,27 +257,27 @@ function ProductCard({ product }: { product: NutritionInfo }) {
                       className={`py-2 px-4 ${THEME.textPrimary} font-medium`}
                       style={{ fontSize: "0.9rem" }}
                     >
-                      {row.nutriente}
+                      {row.nutrient}
                     </td>
                     <td
                       className={`py-2 px-4 text-right ${THEME.textSecondary}`}
                       style={{ fontSize: "0.9rem" }}
                     >
-                      {row.quantidade}
+                      {row.amount}
                     </td>
                     <td
                       className={`py-2 px-4 text-right ${THEME.textSecondary}`}
                       style={{ fontSize: "0.9rem" }}
                     >
-                      {row.vd ?? "—"}
+                      {row.dailyValue ?? "—"}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <p className={`text-xs ${THEME.textSecondary} px-4 py-2 bg-[#FFF8F0]`}>
-              * % Valores Diários com base em uma dieta de 2.000 kcal. Seus valores diários
-              podem ser maiores ou menores dependendo das suas necessidades energéticas.
+              * Percent Daily Values are based on a 2,000 calorie diet. Your daily values may
+              be higher or lower depending on your calorie needs.
             </p>
           </div>
         )}
@@ -287,26 +287,26 @@ function ProductCard({ product }: { product: NutritionInfo }) {
 }
 
 // ─────────────────────────────────────────────────────────
-//  COMPONENTE PRINCIPAL: Catálogo Público
+//  MAIN COMPONENT: Public Catalog
 // ─────────────────────────────────────────────────────────
 export function PublicCatalog() {
-  const [activeCategory, setActiveCategory] = useState("Todos")
+  const [activeCategory, setActiveCategory] = useState("All")
 
-  const allCategories = ["Todos", ...nutriCategories]
+  const allCategories = ["All", ...nutritionCategories]
 
-  const filtered = activeCategory === "Todos"
+  const filtered = activeCategory === "All"
     ? nutritionData
-    : nutritionData.filter((p) => p.categoria === activeCategory)
+    : nutritionData.filter((p) => p.category === activeCategory)
 
   return (
     <section className={`min-h-screen ${THEME.pageBg}`}>
 
-      {/* ─────── HERO / CABEÇALHO ─────── */}
+      {/* ─────── HERO / HEADER ─────── */}
       <div
         className="relative text-white py-12 px-4 text-center overflow-hidden"
         style={{ backgroundColor: THEME.primary }}
       >
-        {/* Fundo decorativo */}
+        {/* Decorative background */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -329,23 +329,23 @@ export function PublicCatalog() {
             className="font-extrabold leading-tight"
             style={{ fontSize: "clamp(1.8rem, 5vw, 2.8rem)" }}
           >
-            Catálogo de Produtos
+            Product Catalog
           </h1>
 
           <p
             className="text-white/80 max-w-md"
             style={{ fontSize: "clamp(1rem, 2.5vw, 1.2rem)", lineHeight: "1.6" }}
           >
-            Conheça a linha {BRAND.name}: granolas, pastas de oleaginosas, snacks,
-            chás e barras de cereal para o seu ponto de venda.
+            Discover the {BRAND.name} line: granolas, nut butters, snacks,
+            teas and cereal bars for your store.
           </p>
 
           <div className="flex flex-wrap justify-center gap-3 mt-2">
             {[
-              { icon: "🌱", label: "Ingredientes Naturais" },
-              { icon: "🚫", label: "Sem Conservantes" },
-              { icon: "🌾", label: "Fonte de Fibras" },
-              { icon: "📦", label: "Venda no Atacado" },
+              { icon: "🌱", label: "Natural Ingredients" },
+              { icon: "🚫", label: "No Preservatives" },
+              { icon: "🌾", label: "Source of Fiber" },
+              { icon: "📦", label: "Wholesale Supply" },
             ].map((tag) => (
               <span
                 key={tag.label}
@@ -358,7 +358,7 @@ export function PublicCatalog() {
         </div>
       </div>
 
-      {/* ─────── FILTROS DE CATEGORIA ─────── */}
+      {/* ─────── CATEGORY FILTERS ─────── */}
       <div
         className="sticky top-0 z-20 border-b border-[#E8D5C0] bg-white/95 backdrop-blur-sm"
         style={{ boxShadow: "0 2px 8px rgba(61,28,6,0.06)" }}
@@ -393,19 +393,19 @@ export function PublicCatalog() {
         </div>
       </div>
 
-      {/* ─────── GRID DE PRODUTOS ─────── */}
+      {/* ─────── PRODUCT GRID ─────── */}
       <div className="max-w-6xl mx-auto px-4 py-10">
 
-        {/* Contador */}
+        {/* Counter */}
         <p className={`mb-6 text-base ${THEME.textSecondary}`}>
-          Exibindo <strong>{filtered.length}</strong> produto
+          Showing <strong>{filtered.length}</strong> product
           {filtered.length !== 1 && "s"}
-          {activeCategory !== "Todos" && (
-            <> em <strong>{activeCategory}</strong></>
+          {activeCategory !== "All" && (
+            <> in <strong>{activeCategory}</strong></>
           )}
         </p>
 
-        {/* Grid responsivo */}
+        {/* Responsive grid */}
         <div
           className="grid gap-6"
           style={{
@@ -421,13 +421,13 @@ export function PublicCatalog() {
           <div className="text-center py-20">
             <span className="text-5xl">😕</span>
             <p className={`mt-4 text-lg ${THEME.textSecondary}`}>
-              Nenhum produto encontrado nesta categoria.
+              No products found in this category.
             </p>
           </div>
         )}
       </div>
 
-      {/* ─────── RODAPÉ DO CATÁLOGO ─────── */}
+      {/* ─────── CATALOG FOOTER ─────── */}
       <footer
         className="text-center py-8 px-4 text-sm"
         style={{ color: THEME.accent, backgroundColor: "#FFF0E0" }}
@@ -436,7 +436,7 @@ export function PublicCatalog() {
           {BRAND.name} · {BRAND.tagline}
         </p>
         <p className="mt-1" style={{ color: "#7A5C44" }}>
-          Marca e produtos fictícios. Informações nutricionais meramente ilustrativas.
+          Sample brand and products. Nutrition facts are for illustration only.
         </p>
       </footer>
     </section>

@@ -1,310 +1,309 @@
 // ============================================================
-//  DADOS NUTRICIONAIS — FICTÍCIOS
-//  Valores inventados para demonstração. Não correspondem a
-//  nenhum produto real.
+//  NUTRITION FACTS — SAMPLE DATA
+//  Made-up values for demonstration. They do not describe any
+//  real product.
 //
-//  Como editar:
-//  - Cada objeto dentro do array "nutritionData" representa um produto
-//  - "key" é um identificador livre do produto
-//  - "highlights" são os 3 destaques que aparecem nos cards
-//  - "table" é a tabela nutricional completa por porção
+//  How to edit:
+//  - Each object in the "nutritionData" array is one product
+//  - "key" is a free-form product identifier
+//  - "highlights" are the 3 figures shown on each card
+//  - "table" is the full nutrition table per serving
 // ============================================================
 
 export interface NutrientRow {
-  nutriente: string
-  quantidade: string
-  vd?: string // % Valor Diário — opcional
+  nutrient: string
+  amount: string
+  dailyValue?: string // % Daily Value — optional
 }
 
 export interface NutritionInfo {
-  /** Deve bater com product.produto OU ser um id livre */
+  /** Free-form product identifier */
   key: string
-  /** Nome amigável para exibição */
-  displayName: string
-  /** Categoria visual do produto */
-  categoria: string
-  /** Porção de referência */
-  porcao: string
-  /** Porções por embalagem */
-  porcoesPorEmbalagem?: string
-  /** 3 destaques visuais (ícone emoji, label, valor) */
-  highlights: { icon: string; label: string; valor: string }[]
-  /** Tabela nutricional completa */
+  /** Display name */
+  name: string
+  /** Product category */
+  category: string
+  /** Reference serving */
+  servingSize: string
+  /** Servings per package */
+  servingsPerPackage?: string
+  /** 3 highlighted figures (emoji icon, label, value) */
+  highlights: { icon: string; label: string; value: string }[]
+  /** Full nutrition table */
   table: NutrientRow[]
-  /** Diferenciais / alertas (sem glúten, vegan, etc.) */
-  diferenciais: string[]
-  /** Imagem do produto (caminho relativo /images/...) */
+  /** Selling points (gluten free, vegan, etc.) */
+  features: string[]
+  /** Product image (path under /images/...) */
   image?: string
-  /** Shelf life do produto */
+  /** Shelf life */
   shelfLife?: string
-  /** Modo de uso resumido */
-  modoDeUso?: string
+  /** Short directions for use */
+  directions?: string
 }
 
 export const nutritionData: NutritionInfo[] = [
   // ─────────────────────────────────────────────────
-  //  GRANOLAS — porção 40g (4 colheres de sopa)
+  //  GRANOLA — 40g serving (4 tablespoons)
   // ─────────────────────────────────────────────────
   {
-    key: "granola-mel",
-    displayName: "Granola Tradicional com Mel",
-    categoria: "Granola",
-    porcao: "40g (4 colheres de sopa)",
-    porcoesPorEmbalagem: "20 porções",
-    shelfLife: "12 meses",
-    modoDeUso: "Sirva com iogurte, leite ou frutas.",
+    key: "honey-granola",
+    name: "Honey Granola",
+    category: "Granola",
+    servingSize: "40g (4 tablespoons)",
+    servingsPerPackage: "20 servings",
+    shelfLife: "12 months",
+    directions: "Serve with yogurt, milk or fruit.",
     image: "/images/products/granola.svg",
     highlights: [
-      { icon: "🔥", label: "Calorias", valor: "172 kcal" },
-      { icon: "🌾", label: "Fibras", valor: "3,6g" },
-      { icon: "💪", label: "Proteínas", valor: "4,1g" },
+      { icon: "🔥", label: "Calories", value: "172 kcal" },
+      { icon: "🌾", label: "Fiber", value: "3.6g" },
+      { icon: "💪", label: "Protein", value: "4.1g" },
     ],
-    diferenciais: ["Com aveia em flocos", "Sem conservantes", "Adoçada com mel"],
+    features: ["Rolled oats", "No preservatives", "Sweetened with honey"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "172 kcal / 722 kJ", vd: "9%" },
-      { nutriente: "Carboidratos", quantidade: "26g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "5,2g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "4,1g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "5,8g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "1,2g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "3,6g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "12mg", vd: "—" },
+      { nutrient: "Energy", amount: "172 kcal / 722 kJ", dailyValue: "9%" },
+      { nutrient: "Carbohydrates", amount: "26g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "5.2g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "4.1g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "5.8g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "1.2g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "3.6g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "12mg", dailyValue: "—" },
     ],
   },
   {
-    key: "granola-sem-acucar",
-    displayName: "Granola Sem Açúcar Castanhas",
-    categoria: "Granola",
-    porcao: "40g (4 colheres de sopa)",
-    porcoesPorEmbalagem: "10 porções",
-    shelfLife: "12 meses",
-    modoDeUso: "Sirva com iogurte, leite ou frutas.",
+    key: "no-sugar-nut-granola",
+    name: "No Sugar Added Nut Granola",
+    category: "Granola",
+    servingSize: "40g (4 tablespoons)",
+    servingsPerPackage: "10 servings",
+    shelfLife: "12 months",
+    directions: "Serve with yogurt, milk or fruit.",
     image: "/images/products/granola.svg",
     highlights: [
-      { icon: "🔥", label: "Calorias", valor: "168 kcal" },
-      { icon: "🌾", label: "Fibras", valor: "4,4g" },
-      { icon: "🍯", label: "Açúcar adic.", valor: "0g" },
+      { icon: "🔥", label: "Calories", value: "168 kcal" },
+      { icon: "🌾", label: "Fiber", value: "4.4g" },
+      { icon: "🍯", label: "Added sugar", value: "0g" },
     ],
-    diferenciais: ["Zero açúcar adicionado", "Com castanhas", "Fonte de fibras"],
+    features: ["No added sugar", "With nuts", "Source of fiber"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "168 kcal / 705 kJ", vd: "8%" },
-      { nutriente: "Carboidratos", quantidade: "21g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "0g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "4,8g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "7,1g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "1,4g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "4,4g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "8mg", vd: "—" },
+      { nutrient: "Energy", amount: "168 kcal / 705 kJ", dailyValue: "8%" },
+      { nutrient: "Carbohydrates", amount: "21g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "0g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "4.8g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "7.1g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "1.4g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "4.4g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "8mg", dailyValue: "—" },
     ],
   },
   // ─────────────────────────────────────────────────
-  //  PASTAS DE OLEAGINOSAS — porção 15g (1 colher de sopa)
+  //  NUT BUTTERS — 15g serving (1 tablespoon)
   // ─────────────────────────────────────────────────
   {
-    key: "pasta-amendoim-integral",
-    displayName: "Pasta de Amendoim Integral",
-    categoria: "Pasta de Oleaginosas",
-    porcao: "15g (1 colher de sopa)",
-    porcoesPorEmbalagem: "66 porções",
-    shelfLife: "12 meses",
-    image: "/images/products/pasta.svg",
+    key: "natural-peanut-butter",
+    name: "Natural Peanut Butter",
+    category: "Nut Butters",
+    servingSize: "15g (1 tablespoon)",
+    servingsPerPackage: "66 servings",
+    shelfLife: "12 months",
+    image: "/images/products/nut-butter.svg",
     highlights: [
-      { icon: "💪", label: "Proteínas", valor: "3,9g" },
-      { icon: "🔥", label: "Calorias", valor: "92 kcal" },
-      { icon: "🥜", label: "Amendoim", valor: "100%" },
+      { icon: "💪", label: "Protein", value: "3.9g" },
+      { icon: "🔥", label: "Calories", value: "92 kcal" },
+      { icon: "🥜", label: "Peanuts", value: "100%" },
     ],
-    diferenciais: ["100% amendoim", "Sem sal", "Sem açúcar adicionado"],
+    features: ["100% peanuts", "No salt", "No added sugar"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "92 kcal / 386 kJ", vd: "5%" },
-      { nutriente: "Carboidratos", quantidade: "2,4g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "0g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "3,9g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "7,4g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "1,3g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "1,2g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "2mg", vd: "—" },
+      { nutrient: "Energy", amount: "92 kcal / 386 kJ", dailyValue: "5%" },
+      { nutrient: "Carbohydrates", amount: "2.4g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "0g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "3.9g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "7.4g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "1.3g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "1.2g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "2mg", dailyValue: "—" },
     ],
   },
   {
-    key: "pasta-caju",
-    displayName: "Pasta de Castanha de Caju",
-    categoria: "Pasta de Oleaginosas",
-    porcao: "15g (1 colher de sopa)",
-    porcoesPorEmbalagem: "20 porções",
-    shelfLife: "10 meses",
-    image: "/images/products/pasta.svg",
+    key: "cashew-butter",
+    name: "Cashew Butter",
+    category: "Nut Butters",
+    servingSize: "15g (1 tablespoon)",
+    servingsPerPackage: "20 servings",
+    shelfLife: "10 months",
+    image: "/images/products/nut-butter.svg",
     highlights: [
-      { icon: "🔥", label: "Calorias", valor: "88 kcal" },
-      { icon: "💪", label: "Proteínas", valor: "2,7g" },
-      { icon: "🌾", label: "Fibras", valor: "0,5g" },
+      { icon: "🔥", label: "Calories", value: "88 kcal" },
+      { icon: "💪", label: "Protein", value: "2.7g" },
+      { icon: "🌾", label: "Fiber", value: "0.5g" },
     ],
-    diferenciais: ["Textura cremosa", "Sem conservantes", "Vegano"],
+    features: ["Creamy texture", "No preservatives", "Vegan"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "88 kcal / 370 kJ", vd: "4%" },
-      { nutriente: "Carboidratos", quantidade: "4,5g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "0g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "2,7g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "6,9g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "1,4g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "0,5g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "3mg", vd: "—" },
+      { nutrient: "Energy", amount: "88 kcal / 370 kJ", dailyValue: "4%" },
+      { nutrient: "Carbohydrates", amount: "4.5g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "0g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "2.7g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "6.9g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "1.4g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "0.5g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "3mg", dailyValue: "—" },
     ],
   },
   // ─────────────────────────────────────────────────
-  //  SNACKS ASSADOS — porção 25g
+  //  BAKED SNACKS — 25g serving
   // ─────────────────────────────────────────────────
   {
-    key: "chips-grao-de-bico",
-    displayName: "Chips de Grão-de-Bico Páprica",
-    categoria: "Snack Assado",
-    porcao: "25g (1/3 do pacote)",
-    porcoesPorEmbalagem: "~3 porções",
-    shelfLife: "6 meses",
+    key: "paprika-chickpea-chips",
+    name: "Paprika Chickpea Chips",
+    category: "Baked Snacks",
+    servingSize: "25g (1/3 of the bag)",
+    servingsPerPackage: "~3 servings",
+    shelfLife: "6 months",
     image: "/images/products/snack.svg",
     highlights: [
-      { icon: "🔥", label: "Calorias", valor: "108 kcal" },
-      { icon: "💪", label: "Proteínas", valor: "4,2g" },
-      { icon: "🌾", label: "Fibras", valor: "2,9g" },
+      { icon: "🔥", label: "Calories", value: "108 kcal" },
+      { icon: "💪", label: "Protein", value: "4.2g" },
+      { icon: "🌾", label: "Fiber", value: "2.9g" },
     ],
-    diferenciais: ["Assado, não frito", "Sem glúten", "Vegano"],
+    features: ["Baked, not fried", "Gluten free", "Vegan"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "108 kcal / 454 kJ", vd: "5%" },
-      { nutriente: "Carboidratos", quantidade: "14g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "0g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "4,2g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "3,6g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "0,5g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "2,9g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "140mg", vd: "—" },
+      { nutrient: "Energy", amount: "108 kcal / 454 kJ", dailyValue: "5%" },
+      { nutrient: "Carbohydrates", amount: "14g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "0g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "4.2g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "3.6g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "0.5g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "2.9g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "140mg", dailyValue: "—" },
     ],
   },
   {
-    key: "biscoito-arroz",
-    displayName: "Biscoito de Arroz Integral Ervas",
-    categoria: "Snack Assado",
-    porcao: "25g (5 unidades)",
-    porcoesPorEmbalagem: "4 porções",
-    shelfLife: "8 meses",
+    key: "herb-rice-crackers",
+    name: "Herb Brown Rice Crackers",
+    category: "Baked Snacks",
+    servingSize: "25g (5 crackers)",
+    servingsPerPackage: "4 servings",
+    shelfLife: "8 months",
     image: "/images/products/snack.svg",
     highlights: [
-      { icon: "🔥", label: "Calorias", valor: "96 kcal" },
-      { icon: "🧂", label: "Sódio", valor: "85mg" },
-      { icon: "🌾", label: "Fibras", valor: "1,1g" },
+      { icon: "🔥", label: "Calories", value: "96 kcal" },
+      { icon: "🧂", label: "Sodium", value: "85mg" },
+      { icon: "🌾", label: "Fiber", value: "1.1g" },
     ],
-    diferenciais: ["Arroz integral", "Sem glúten", "Baixo teor de gordura"],
+    features: ["Brown rice", "Gluten free", "Low fat"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "96 kcal / 403 kJ", vd: "5%" },
-      { nutriente: "Carboidratos", quantidade: "20g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "0g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "2,0g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "0,8g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "0,2g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "1,1g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "85mg", vd: "—" },
+      { nutrient: "Energy", amount: "96 kcal / 403 kJ", dailyValue: "5%" },
+      { nutrient: "Carbohydrates", amount: "20g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "0g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "2.0g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "0.8g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "0.2g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "1.1g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "85mg", dailyValue: "—" },
     ],
   },
   // ─────────────────────────────────────────────────
-  //  CHÁS E INFUSÕES — porção 200ml (1 sachê)
+  //  TEAS & INFUSIONS — 200ml serving (1 tea bag)
   // ─────────────────────────────────────────────────
   {
-    key: "cha-verde-hortela",
-    displayName: "Chá Verde com Hortelã",
-    categoria: "Chá e Infusão",
-    porcao: "200ml (1 sachê)",
-    porcoesPorEmbalagem: "20 porções",
-    shelfLife: "24 meses",
-    modoDeUso: "Deixe 1 sachê em infusão em 200ml de água quente por 3 minutos.",
-    image: "/images/products/cha.svg",
+    key: "green-tea-mint",
+    name: "Green Tea with Mint",
+    category: "Teas & Infusions",
+    servingSize: "200ml (1 tea bag)",
+    servingsPerPackage: "20 servings",
+    shelfLife: "24 months",
+    directions: "Steep 1 tea bag in 200ml of hot water for 3 minutes.",
+    image: "/images/products/tea.svg",
     highlights: [
-      { icon: "🔥", label: "Calorias", valor: "2 kcal" },
-      { icon: "🌿", label: "Ingredientes", valor: "2" },
-      { icon: "🍯", label: "Açúcar adic.", valor: "0g" },
+      { icon: "🔥", label: "Calories", value: "2 kcal" },
+      { icon: "🌿", label: "Ingredients", value: "2" },
+      { icon: "🍯", label: "Added sugar", value: "0g" },
     ],
-    diferenciais: ["Sem açúcar", "Sem aromatizantes artificiais"],
+    features: ["No sugar", "No artificial flavors"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "2 kcal / 8 kJ", vd: "0%" },
-      { nutriente: "Carboidratos", quantidade: "0,4g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "0g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "0g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "0g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "0g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "0g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "1mg", vd: "—" },
+      { nutrient: "Energy", amount: "2 kcal / 8 kJ", dailyValue: "0%" },
+      { nutrient: "Carbohydrates", amount: "0.4g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "0g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "0g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "0g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "0g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "0g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "1mg", dailyValue: "—" },
     ],
   },
   // ─────────────────────────────────────────────────
-  //  BARRAS DE CEREAL — porção 25g (1 unidade)
+  //  CEREAL BARS — 25g serving (1 bar)
   // ─────────────────────────────────────────────────
   {
-    key: "barra-banana-aveia",
-    displayName: "Barra de Cereal Banana e Aveia",
-    categoria: "Barra de Cereal",
-    porcao: "25g (1 unidade)",
-    porcoesPorEmbalagem: "12 unidades por caixa",
-    shelfLife: "9 meses",
-    image: "/images/products/barra.svg",
+    key: "banana-oat-bar",
+    name: "Banana Oat Cereal Bar",
+    category: "Cereal Bars",
+    servingSize: "25g (1 bar)",
+    servingsPerPackage: "12 bars per box",
+    shelfLife: "9 months",
+    image: "/images/products/bar.svg",
     highlights: [
-      { icon: "🔥", label: "Calorias", valor: "98 kcal" },
-      { icon: "🌾", label: "Fibras", valor: "1,8g" },
-      { icon: "🍌", label: "Fruta", valor: "Banana" },
+      { icon: "🔥", label: "Calories", value: "98 kcal" },
+      { icon: "🌾", label: "Fiber", value: "1.8g" },
+      { icon: "🍌", label: "Fruit", value: "Banana" },
     ],
-    diferenciais: ["Com pedaços de fruta", "Fonte de fibras"],
+    features: ["With fruit pieces", "Source of fiber"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "98 kcal / 412 kJ", vd: "5%" },
-      { nutriente: "Carboidratos", quantidade: "17g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "4,1g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "1,6g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "2,6g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "0,6g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "1,8g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "18mg", vd: "—" },
+      { nutrient: "Energy", amount: "98 kcal / 412 kJ", dailyValue: "5%" },
+      { nutrient: "Carbohydrates", amount: "17g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "4.1g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "1.6g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "2.6g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "0.6g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "1.8g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "18mg", dailyValue: "—" },
     ],
   },
   {
-    key: "barra-castanhas-mel",
-    displayName: "Barra de Cereal Castanhas e Mel",
-    categoria: "Barra de Cereal",
-    porcao: "25g (1 unidade)",
-    porcoesPorEmbalagem: "12 unidades por caixa",
-    shelfLife: "9 meses",
-    image: "/images/products/barra.svg",
+    key: "nut-honey-bar",
+    name: "Nut & Honey Cereal Bar",
+    category: "Cereal Bars",
+    servingSize: "25g (1 bar)",
+    servingsPerPackage: "12 bars per box",
+    shelfLife: "9 months",
+    image: "/images/products/bar.svg",
     highlights: [
-      { icon: "🔥", label: "Calorias", valor: "112 kcal" },
-      { icon: "💪", label: "Proteínas", valor: "2,3g" },
-      { icon: "🌾", label: "Fibras", valor: "1,5g" },
+      { icon: "🔥", label: "Calories", value: "112 kcal" },
+      { icon: "💪", label: "Protein", value: "2.3g" },
+      { icon: "🌾", label: "Fiber", value: "1.5g" },
     ],
-    diferenciais: ["Com castanhas", "Adoçada com mel"],
+    features: ["With nuts", "Sweetened with honey"],
     table: [
-      { nutriente: "Valor Energético", quantidade: "112 kcal / 470 kJ", vd: "6%" },
-      { nutriente: "Carboidratos", quantidade: "15g", vd: "—" },
-      { nutriente: "Açúcares Adicionados", quantidade: "4,8g", vd: "—" },
-      { nutriente: "Proteínas", quantidade: "2,3g", vd: "—" },
-      { nutriente: "Gorduras Totais", quantidade: "4,6g", vd: "—" },
-      { nutriente: "Gorduras Saturadas", quantidade: "0,8g", vd: "—" },
-      { nutriente: "Gorduras Trans", quantidade: "0g", vd: "0%" },
-      { nutriente: "Fibra Alimentar", quantidade: "1,5g", vd: "—" },
-      { nutriente: "Sódio", quantidade: "22mg", vd: "—" },
+      { nutrient: "Energy", amount: "112 kcal / 470 kJ", dailyValue: "6%" },
+      { nutrient: "Carbohydrates", amount: "15g", dailyValue: "—" },
+      { nutrient: "Added Sugars", amount: "4.8g", dailyValue: "—" },
+      { nutrient: "Protein", amount: "2.3g", dailyValue: "—" },
+      { nutrient: "Total Fat", amount: "4.6g", dailyValue: "—" },
+      { nutrient: "Saturated Fat", amount: "0.8g", dailyValue: "—" },
+      { nutrient: "Trans Fat", amount: "0g", dailyValue: "0%" },
+      { nutrient: "Dietary Fiber", amount: "1.5g", dailyValue: "—" },
+      { nutrient: "Sodium", amount: "22mg", dailyValue: "—" },
     ],
   },
 ]
 
 // ─────────────────────────────────────────────────────────
-//  MAPA DE LOOKUP: key → NutritionInfo
-//  Útil para componentes que precisam buscar por chave
+//  LOOKUP MAP: key → NutritionInfo
 // ─────────────────────────────────────────────────────────
 export const nutritionMap = Object.fromEntries(
   nutritionData.map((n) => [n.key, n])
 ) as Record<string, NutritionInfo>
 
-// Lista de categorias únicas
-export const nutriCategories = Array.from(
-  new Set(nutritionData.map((n) => n.categoria))
+// Unique list of categories
+export const nutritionCategories = Array.from(
+  new Set(nutritionData.map((n) => n.category))
 )
